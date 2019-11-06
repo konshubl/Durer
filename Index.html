@@ -1,7 +1,139 @@
 ﻿<!DOCTYPE html>
 <html>
-<body>
-  <h1>Hello World</h1>
-  <p>I'm hosted with GitHub Pages.</p>
+<head>
+  <script type="text/javascript">
+
+    var g_oSplat;
+
+    function window_onload()
+    {
+      g_oSplat = new Splat();
+      document.body.appendChild(g_oSplat.element);
+
+      g_oSplat.setPageSize({ "width": 600 });
+
+      document.forms[0].red.value = 255;
+      document.forms[0].blue.value = 0;
+      document.forms[0].green.value = 0;
+
+      onSubmit();
+    }
+
+    function onSubmit(oEvent)
+    {
+      if (oEvent)
+        oEvent.preventDefault();
+
+      g_oSplat.setColor(
+        parseInt(document.forms[0].red.value),
+        parseInt(document.forms[0].green.value),
+        parseInt(document.forms[0].blue.value)
+      );
+      g_oSplat.draw();
+
+      return false;
+    }
+
+    function Splat()
+    {
+      var _this = this;
+      //_this.element
+
+      var m_oContext;
+      var m_oCanvas;
+
+      var m_iRed;
+      var m_iGreen;
+      var m_iBlue;
+
+      function Init()
+      {
+        _this.element = document.createElement("div");
+
+        m_oCanvas = document.createElement("canvas");
+        m_oContext = m_oCanvas.getContext("2d");
+
+        _this.element.appendChild(m_oCanvas);
+      }
+
+      function rgbToHex(r, g, b)
+      {
+        return "#" + itoHex(r) + itoHex(g) + itoHex(b);
+      }
+
+      function itoHex(i)
+      { 
+        var hex = i.toString(16);
+        if (hex.length < 2)
+          hex = "0" + hex;
+        return hex;
+      }
+
+      _this.setColor = function (r, g, b)
+      {
+        m_iRed = Math.max(Math.min(r, 255), 0);
+        m_iGreen = Math.max(Math.min(g, 255), 0);;
+        m_iBlue = Math.max(Math.min(b, 255), 0);;
+      };
+
+      _this.draw = function ()
+      {
+        var iSize = m_oCanvas.width;
+
+        var fStep = 255 / iSize;
+
+        var iR = 255;
+        var iG = 255;
+        var iB = 255;
+
+        var iX = 0;
+        var iY = 0;
+
+        var iDeltaRStep = (iR - m_iRed) / iSize;
+        var iDeltaGStep = (iG - m_iGreen) / iSize;
+        var iDeltaBStep = (iB - m_iBlue) / iSize;
+
+
+        var iR2;
+        var iG2;
+        var iB2;
+
+        for (iY = 0; iY < iSize; iY++)
+          {
+            iR = Math.floor(255 - iY * fStep);
+            iG = Math.floor(255 - iY * fStep);
+            iB = Math.floor(255 - iY * fStep);
+
+            for (iX = 0; iX < iSize; iX++)
+              {
+                iR2 = Math.floor(iR - iX * iDeltaRStep);
+                iG2 = Math.floor(iG - iX * iDeltaGStep);
+                iB2 = Math.floor(iB - iX * iDeltaBStep);
+
+                m_oContext.fillStyle = rgbToHex(iR2, iG2, iB2);
+                m_oContext.fillRect(iX, iY, 1, 1);
+              }
+          }
+
+      };
+
+      _this.setPageSize = function (oSize)
+      {
+        m_oCanvas.width = oSize.width;
+        m_oCanvas.height = oSize.width;//oSize.height;
+      };
+
+      Init();
+    }
+
+  </script>
+</head>
+<body onload="window_onload()">
+<form onsubmit="onSubmit(event)">
+  <input name="red" placeholder="red" value="255"/>
+  <input name="green" placeholder="green" value="0"/>
+  <input name="blue" placeholder="blue" value="0"/>
+  <input type="submit"/>
+</form>
 </body>
 </html>
